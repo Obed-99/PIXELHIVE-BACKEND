@@ -1,6 +1,7 @@
 package com.pixelhive.backend.controller;
 
 import com.pixelhive.backend.dto.CreateProjectRequest;
+import com.pixelhive.backend.dto.UpdateStatusRequest;
 import com.pixelhive.backend.entity.Project;
 import com.pixelhive.backend.entity.User;
 import com.pixelhive.backend.repository.ProjectRepository;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -28,10 +30,18 @@ public class ProjectController {
         return projectRepository.findAll();
     }
 
+    // GET /api/projects/{id} - fetch ONE project by its id.
+    // The {id} in the URL is captured into the 'id' parameter by @PathVariable.
+    @GetMapping("/{id}")
+    public Project getProject(@PathVariable Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No project with id " + id));
+    }
+
     // POST /api/projects - create a project for a given creator.
     @PostMapping
     public Project createProject(@RequestBody CreateProjectRequest request) {
-        // Look up the creator User by id; reject the request if they don't exist.
         User creator = userRepository.findById(request.creatorId())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "No user found with creatorId " + request.creatorId()));
@@ -39,7 +49,6 @@ public class ProjectController {
         Project project = new Project();
         project.setCreator(creator);
 
-        // A client is optional. If one was given, look them up too.
         if (request.clientId() != null) {
             User client = userRepository.findById(request.clientId())
                     .orElseThrow(() -> new ResponseStatusException(
@@ -51,6 +60,23 @@ public class ProjectController {
         project.setDescription(request.description());
         project.setPrice(request.price());
 
+        return projectRepository.save(project);
+    }
+
+    // PATCH /api/projects/{id}/status - move a project along its lifecycle.
+    @PatchMapping("/{id}/status")
+    public Project updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+        // Guard: only allow the statuses your database CHECK constraint permits.
+        Set<String> allowed = Set.of("draft", "active", "delivered", "completed", "cancelled");
+        if (request.status() == null || !allowed.contains(request.status())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status must be one of " + allowed);
+        }
+
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No project with id " + id));
+
+        project.setStatus(request.status());
         return projectRepository.save(project);
     }
 }
