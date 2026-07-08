@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS media_assets (
     s3_key_preview  VARCHAR(500),            -- path to the watermarked preview
     file_size       BIGINT,                  -- size in bytes
     status          VARCHAR(20)  NOT NULL DEFAULT 'uploaded',
+    view_count      INTEGER      NOT NULL DEFAULT 0,   -- analytics: preview views
+    download_count  INTEGER      NOT NULL DEFAULT 0,   -- analytics: downloads
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
 
     CONSTRAINT media_assets_status_check
@@ -110,3 +112,23 @@ CREATE TABLE IF NOT EXISTS messages (
     read_at    TIMESTAMPTZ,                 -- NULL = not read yet
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- =====================================================================
+-- Table: notifications
+-- In-app alerts for a user (payment received, file viewed, contract signed).
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS notifications (
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    BIGINT       NOT NULL REFERENCES users(id),
+    type       VARCHAR(30)  NOT NULL,          -- payment | view | contract | message
+    message    VARCHAR(255) NOT NULL,
+    is_read    BOOLEAN      NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+-- =====================================================================
+-- Migrations for databases created before the analytics columns existed.
+-- Safe to run repeatedly.
+-- =====================================================================
+ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS view_count     INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS download_count INTEGER NOT NULL DEFAULT 0;
