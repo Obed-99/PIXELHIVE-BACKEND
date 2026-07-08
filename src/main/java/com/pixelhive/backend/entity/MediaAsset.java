@@ -34,6 +34,13 @@ public class MediaAsset {
     @Column(nullable = false)
     private String status = "uploaded";
 
+    // Analytics counters.
+    @Column(name = "view_count", nullable = false)
+    private int viewCount = 0;
+
+    @Column(name = "download_count", nullable = false)
+    private int downloadCount = 0;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
@@ -90,6 +97,22 @@ public class MediaAsset {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public int getDownloadCount() {
+        return downloadCount;
+    }
+
+    public void setDownloadCount(int downloadCount) {
+        this.downloadCount = downloadCount;
     }
 
     public OffsetDateTime getCreatedAt() {

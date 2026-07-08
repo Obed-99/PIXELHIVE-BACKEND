@@ -50,4 +50,26 @@ public class MediaAssetController {
 
         return mediaAssetRepository.save(asset);
     }
+
+    // POST /api/media/{id}/view - record a preview view (analytics).
+    @PostMapping("/{id}/view")
+    public MediaAsset recordView(@PathVariable Long id) {
+        MediaAsset asset = findOr404(id);
+        asset.setViewCount(asset.getViewCount() + 1);
+        return mediaAssetRepository.save(asset);
+    }
+
+    // POST /api/media/{id}/download - record a download (analytics).
+    @PostMapping("/{id}/download")
+    public MediaAsset recordDownload(@PathVariable Long id) {
+        MediaAsset asset = findOr404(id);
+        asset.setDownloadCount(asset.getDownloadCount() + 1);
+        return mediaAssetRepository.save(asset);
+    }
+
+    private MediaAsset findOr404(Long id) {
+        return mediaAssetRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No media asset with id " + id));
+    }
 }
