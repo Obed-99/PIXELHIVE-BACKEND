@@ -132,3 +132,4 @@ CREATE TABLE IF NOT EXISTS notifications (
 -- =====================================================================
 ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS view_count     INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS download_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS created_at     TIMESTAMPTZ NOT NULL DEFAULT now();
