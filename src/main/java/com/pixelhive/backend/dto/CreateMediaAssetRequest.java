@@ -6,6 +6,7 @@ public record CreateMediaAssetRequest(
         String fileName,
         String s3KeyOriginal,
         String s3KeyPreview,
-        Long fileSize
+        Long fileSize,
+        String previewData
 ) {
 }

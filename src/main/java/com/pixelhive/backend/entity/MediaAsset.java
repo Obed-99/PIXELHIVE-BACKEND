@@ -30,6 +30,10 @@ public class MediaAsset {
     @Column(name = "file_size")
     private Long fileSize;
 
+    // Base64 data-URL of the uploaded image (demo storage - swap for S3 later).
+    @Column(name = "preview_data", columnDefinition = "text")
+    private String previewData;
+
     // uploaded -> watermarked -> released (unlocked after payment).
     @Column(nullable = false)
     private String status = "uploaded";
@@ -89,6 +93,14 @@ public class MediaAsset {
 
     public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public String getPreviewData() {
+        return previewData;
+    }
+
+    public void setPreviewData(String previewData) {
+        this.previewData = previewData;
     }
 
     public String getStatus() {

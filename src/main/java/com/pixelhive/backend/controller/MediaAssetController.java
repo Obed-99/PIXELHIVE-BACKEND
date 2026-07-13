@@ -47,6 +47,7 @@ public class MediaAssetController {
         asset.setS3KeyOriginal(request.s3KeyOriginal());
         asset.setS3KeyPreview(request.s3KeyPreview());
         asset.setFileSize(request.fileSize());
+        asset.setPreviewData(request.previewData());
 
         return mediaAssetRepository.save(asset);
     }
