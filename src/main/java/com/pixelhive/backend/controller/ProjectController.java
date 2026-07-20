@@ -1,6 +1,7 @@
 package com.pixelhive.backend.controller;
 
 import com.pixelhive.backend.dto.CreateProjectRequest;
+import com.pixelhive.backend.dto.UpdateProjectRequest;
 import com.pixelhive.backend.dto.UpdateStatusRequest;
 import com.pixelhive.backend.entity.Project;
 import com.pixelhive.backend.entity.User;
@@ -69,6 +70,28 @@ public class ProjectController {
         project.setDescription(request.description());
         project.setPrice(request.price());
 
+        return projectRepository.save(project);
+    }
+
+    // PATCH /api/projects/{id} - edit a project (e.g. the creator reprices it).
+    @PatchMapping("/{id}")
+    public Project updateProject(@PathVariable Long id, @RequestBody UpdateProjectRequest request) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No project with id " + id));
+
+        if (request.title() != null && !request.title().isBlank()) {
+            project.setTitle(request.title());
+        }
+        if (request.description() != null) {
+            project.setDescription(request.description());
+        }
+        if (request.price() != null) {
+            if (request.price().signum() <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "price must be positive");
+            }
+            project.setPrice(request.price());
+        }
         return projectRepository.save(project);
     }
 
