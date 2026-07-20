@@ -24,9 +24,18 @@ public class ProjectController {
         this.userRepository = userRepository;
     }
 
-    // GET /api/projects - list every project.
+    // GET /api/projects                -> every project
+    // GET /api/projects?creatorId=1    -> only that creator's projects
+    // GET /api/projects?clientId=2     -> only projects made for that client
     @GetMapping
-    public List<Project> getAllProjects() {
+    public List<Project> getProjects(@RequestParam(required = false) Long creatorId,
+                                     @RequestParam(required = false) Long clientId) {
+        if (creatorId != null) {
+            return projectRepository.findByCreatorId(creatorId);
+        }
+        if (clientId != null) {
+            return projectRepository.findByClientId(clientId);
+        }
         return projectRepository.findAll();
     }
 

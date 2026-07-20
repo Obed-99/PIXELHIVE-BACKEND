@@ -8,4 +8,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     // "find every project whose creator has this id" - Spring writes the SQL.
     List<Project> findByCreatorId(Long creatorId);
+
+    // Every project made FOR this client.
+    List<Project> findByClientId(Long clientId);
 }
